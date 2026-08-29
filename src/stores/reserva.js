@@ -4,7 +4,7 @@ import { ref } from 'vue'
 export const useReservaStore = defineStore('reserva', () => {
   // El id del negocio de ejemplo (Dosse Barbería) — más adelante esto puede
   // venir de una ruta o subdominio cuando haya varios negocios reales.
-  const negocioId = ref('a29d2980-49b2-4d7c-8989-819b68643c88')
+  const negocioId = ref(import.meta.env.VITE_NEGOCIO_ID)
 
   const servicio = ref(null)      // objeto completo: { id, nombre, duracion_minutos, precio }
   const fecha = ref(null)         // 'AAAA-MM-DD'

@@ -8,3 +8,18 @@
   --color-acento: #F3E5CC;
   --color-acento-borde: #DDBB88;
 }
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}

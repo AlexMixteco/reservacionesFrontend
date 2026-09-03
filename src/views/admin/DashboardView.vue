@@ -65,7 +65,18 @@ async function cerrarSesion() {
           <h1 class="text-xl font-semibold text-carbon">Reservaciones</h1>
           <p class="text-sm text-gris">{{ auth.usuario?.nombre }}</p>
         </div>
-        <button @click="cerrarSesion" class="text-sm text-gris hover:text-carbon">Cerrar sesión</button>
+        <div class="flex items-center gap-4">
+          <button @click="router.push({ name: 'admin-servicios' })" class="text-sm text-gris hover:text-carbon">
+            Servicios
+          </button>
+          <button @click="router.push({ name: 'admin-horarios' })" class="text-sm text-gris hover:text-carbon">
+            Horarios
+          </button>
+          <button @click="router.push({ name: 'admin-negocio' })" class="text-sm text-gris hover:text-carbon">
+            Mi negocio
+          </button>
+          <button @click="cerrarSesion" class="text-sm text-gris hover:text-carbon">Cerrar sesión</button>
+        </div>
       </div>
 
       <p v-if="cargando" class="text-sm text-gris">Cargando...</p>
@@ -89,7 +100,10 @@ async function cerrarSesion() {
             <tbody>
               <template v-for="r in reservaciones" :key="r.id">
                 <tr class="border-b border-borde last:border-0">
-                  <td class="px-4 py-3 text-carbon">{{ r.nombre_cliente }}</td>
+                  <td class="px-4 py-3 text-carbon">
+                    {{ r.nombre_cliente }}
+                    <p v-if="r.comentario_cliente" class="text-xs text-gris italic mt-0.5">💬 {{ r.comentario_cliente }}</p>
+                  </td>
                   <td class="px-4 py-3 text-carbon">{{ r.servicio.nombre }}</td>
                   <td class="px-4 py-3 text-carbon">{{ r.fecha.split('T')[0] }}</td>
                   <td class="px-4 py-3 text-carbon">{{ r.hora.slice(0, 5) }}</td>
@@ -134,6 +148,7 @@ async function cerrarSesion() {
             </div>
             <p class="text-sm text-gris mb-1">✂️ {{ r.servicio.nombre }}</p>
             <p class="text-sm text-gris mb-3">📅 {{ r.fecha.split('T')[0] }} · 🕐 {{ r.hora.slice(0, 5) }}</p>
+            <p v-if="r.comentario_cliente" class="text-xs text-gris italic mb-3">💬 {{ r.comentario_cliente }}</p>
 
             <button @click="alternarNotas(r.id)" class="text-xs text-carbon underline">
               {{ r.notas_admin ? 'Ver nota' : 'Agregar nota' }}

@@ -11,6 +11,7 @@ const store = useReservaStore()
 const nombre = ref(store.cliente.nombre)
 const telefono = ref(store.cliente.telefono)
 const email = ref(store.cliente.email)
+const comentario = ref('')
 const enviando = ref(false)
 const error = ref(null)
 
@@ -52,6 +53,7 @@ async function confirmarReserva() {
       nombre_cliente: nombre.value,
       telefono_cliente: telefono.value,
       email_cliente: email.value || null,
+      comentario_cliente: comentario.value || null,
     })
 
     router.push({ name: 'confirmacion', params: { token: respuesta.data.token_gestion } })
@@ -91,6 +93,13 @@ async function confirmarReserva() {
         placeholder="Email (opcional)"
         class="w-full rounded-xl border border-borde bg-white px-4 py-3 text-sm text-carbon placeholder:text-gris"
       />
+      <textarea
+        v-model="comentario"
+        rows="3"
+        placeholder="¿Algo que debamos saber? (opcional)"
+        class="w-full rounded-xl border border-borde bg-white px-4 py-3 text-sm text-carbon placeholder:text-gris"
+      ></textarea>
+      
     </div>
 
     <div class="mt-4 rounded-xl border border-acento-borde bg-acento p-4 flex flex-col gap-2 text-sm text-carbon">

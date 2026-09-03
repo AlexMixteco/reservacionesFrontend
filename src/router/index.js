@@ -8,6 +8,9 @@ import GestionView from '../views/GestionView.vue'
 import ReprogramarView from '../views/ReprogramarView.vue'
 import LoginView from '../views/admin/LoginView.vue'
 import DashboardView from '../views/admin/DashboardView.vue'
+import ServiciosView from '../views/admin/ServiciosView.vue'
+import HorariosView from '../views/admin/HorariosView.vue'
+import NegocioView from '../views/admin/NegocioView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -25,6 +28,24 @@ const router = createRouter({
       path: '/admin',
       name: 'admin-dashboard',
       component: DashboardView,
+      meta: { requiereAuth: true },
+    },
+    {
+      path: '/admin/servicios',
+      name: 'admin-servicios',
+      component: ServiciosView,
+      meta: { requiereAuth: true },
+    },
+    {
+      path: '/admin/horarios',
+      name: 'admin-horarios',
+      component: HorariosView,
+      meta: { requiereAuth: true },
+    },
+    {
+      path: '/admin/negocio',
+      name: 'admin-negocio',
+      component: NegocioView,
       meta: { requiereAuth: true },
     },
   ],

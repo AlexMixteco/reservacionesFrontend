@@ -9,7 +9,7 @@ const servicios = ref([])
 const cargando = ref(true)
 const error = ref(null)
 
-const nuevo = reactive({ nombre: '', duracion_minutos: 30, precio: '' })
+const nuevo = reactive({ nombre: '', duracion_minutos: null, precio: '' })
 const creando = ref(false)
 const errorCrear = ref(null)
 
@@ -38,7 +38,7 @@ async function crearServicio() {
       precio: nuevo.precio || null,
     })
     nuevo.nombre = ''
-    nuevo.duracion_minutos = 30
+    nuevo.duracion_minutos = null
     nuevo.precio = ''
     await cargar()
   } catch (e) {
@@ -81,7 +81,7 @@ async function alternarActivo(servicio) {
           <input
             v-model.number="nuevo.duracion_minutos"
             type="number"
-            placeholder="Minutos"
+            placeholder="Duración del servicio (minutos)"
             class="rounded-lg border border-borde bg-white px-3 py-2 text-sm text-carbon placeholder:text-gris"
           />
           <input

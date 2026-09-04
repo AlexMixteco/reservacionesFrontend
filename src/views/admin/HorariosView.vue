@@ -15,6 +15,7 @@ const DIAS = [
   { numero: 6, nombre: 'Sábado' },
 ]
 
+// Estado local por día: { abierto, hora_inicio, hora_fin, guardando }
 const dias = reactive(
   Object.fromEntries(DIAS.map((d) => [d.numero, { abierto: false, hora_inicio: '10:00', hora_fin: '20:00', guardando: false }]))
 )
@@ -105,43 +106,49 @@ async function eliminarBloqueo(id) {
       <h1 class="text-xl font-semibold text-carbon mb-1">Horarios y disponibilidad</h1>
       <p class="text-sm text-gris mb-6">Define cuándo atiende tu negocio, y bloquea fechas específicas.</p>
 
+      <!-- Horarios semanales -->
       <div class="bg-white rounded-2xl border border-borde p-4 mb-6">
         <p class="text-sm font-medium text-carbon mb-3">Horario semanal</p>
         <p v-if="cargandoHorarios" class="text-sm text-gris">Cargando...</p>
         <div v-else class="flex flex-col gap-2">
-          <div v-for="d in DIAS" :key="d.numero" class="flex items-center gap-3 py-1">
-            <button
-              @click="alternarDia(d.numero)"
-              class="w-10 h-6 rounded-full relative shrink-0"
-              :class="dias[d.numero].abierto ? 'bg-carbon' : 'bg-borde'"
-            >
-              <span
-                class="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
-                :class="dias[d.numero].abierto ? 'left-4.5' : 'left-0.5'"
-              ></span>
-            </button>
-            <span class="text-sm text-carbon w-24 shrink-0">{{ d.nombre }}</span>
-            <template v-if="dias[d.numero].abierto">
-              <input
-                v-model="dias[d.numero].hora_inicio"
-                @change="guardarDia(d.numero)"
-                type="time"
-                class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
-              />
-              <span class="text-sm text-gris">a</span>
-              <input
-                v-model="dias[d.numero].hora_fin"
-                @change="guardarDia(d.numero)"
-                type="time"
-                class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
-              />
-              <span v-if="dias[d.numero].guardando" class="text-xs text-gris">Guardando...</span>
-            </template>
-            <span v-else class="text-sm text-gris">Cerrado</span>
+          <div v-for="d in DIAS" :key="d.numero" class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 py-2 border-b border-borde last:border-0 sm:border-0">
+            <div class="flex items-center gap-3">
+              <button
+                @click="alternarDia(d.numero)"
+                class="w-10 h-6 rounded-full relative shrink-0"
+                :class="dias[d.numero].abierto ? 'bg-carbon' : 'bg-borde'"
+              >
+                <span
+                  class="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
+                  :class="dias[d.numero].abierto ? 'left-4.5' : 'left-0.5'"
+                ></span>
+              </button>
+              <span class="text-sm text-carbon w-24 shrink-0">{{ d.nombre }}</span>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <template v-if="dias[d.numero].abierto">
+                <input
+                  v-model="dias[d.numero].hora_inicio"
+                  @change="guardarDia(d.numero)"
+                  type="time"
+                  class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
+                />
+                <span class="text-sm text-gris">a</span>
+                <input
+                  v-model="dias[d.numero].hora_fin"
+                  @change="guardarDia(d.numero)"
+                  type="time"
+                  class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
+                />
+                <span v-if="dias[d.numero].guardando" class="text-xs text-gris">Guardando...</span>
+              </template>
+              <span v-else class="text-sm text-gris">Cerrado</span>
+            </div>
           </div>
         </div>
       </div>
 
+      <!-- Bloqueos -->
       <div class="bg-white rounded-2xl border border-borde p-4">
         <p class="text-sm font-medium text-carbon mb-3">Bloquear una fecha (festivo, vacaciones)</p>
 

@@ -60,12 +60,12 @@ async function cerrarSesion() {
 <template>
   <div class="min-h-screen bg-crema p-4 md:p-6">
     <div class="max-w-3xl mx-auto">
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
         <div>
           <h1 class="text-xl font-semibold text-carbon">Reservaciones</h1>
           <p class="text-sm text-gris">{{ auth.usuario?.nombre }}</p>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
           <button @click="router.push({ name: 'admin-servicios' })" class="text-sm text-gris hover:text-carbon">
             Servicios
           </button>

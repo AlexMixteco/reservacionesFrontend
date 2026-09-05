@@ -18,13 +18,17 @@ const ESTILO_ESTADO = {
   cancelada: 'bg-red-100 text-red-700',
 }
 
-const filaAbierta = ref(null)
+const expandido = reactive({})
 const estadoGuardado = reactive({})
 
 onMounted(async () => {
   try {
     const respuesta = await api.get('/admin/reservaciones')
     reservaciones.value = respuesta.data
+    // Las que ya tienen nota se muestran abiertas desde el inicio, sin tener que darles clic.
+    reservaciones.value.forEach((r) => {
+      expandido[r.id] = !!r.notas_admin
+    })
   } catch (e) {
     error.value = 'No se pudieron cargar las reservaciones.'
   } finally {
@@ -33,7 +37,7 @@ onMounted(async () => {
 })
 
 function alternarNotas(id) {
-  filaAbierta.value = filaAbierta.value === id ? null : id
+  expandido[id] = !expandido[id]
 }
 
 async function guardarNota(reservacion) {
@@ -114,11 +118,11 @@ async function cerrarSesion() {
                   </td>
                   <td class="px-4 py-3 text-right">
                     <button @click="alternarNotas(r.id)" class="text-xs text-gris hover:text-carbon underline">
-                      {{ r.notas_admin ? 'Ver nota' : 'Agregar nota' }}
+                      {{ expandido[r.id] ? 'Ocultar' : (r.notas_admin ? 'Ver nota' : 'Agregar nota') }}
                     </button>
                   </td>
                 </tr>
-                <tr v-if="filaAbierta === r.id" class="border-b border-borde bg-crema">
+                <tr v-if="expandido[r.id]" class="border-b border-borde bg-crema">
                   <td colspan="6" class="px-4 py-3">
                     <PanelNota
                       v-model="r.notas_admin"
@@ -151,10 +155,10 @@ async function cerrarSesion() {
             <p v-if="r.comentario_cliente" class="text-xs text-gris italic mb-3">💬 {{ r.comentario_cliente }}</p>
 
             <button @click="alternarNotas(r.id)" class="text-xs text-carbon underline">
-              {{ r.notas_admin ? 'Ver nota' : 'Agregar nota' }}
+              {{ expandido[r.id] ? 'Ocultar' : (r.notas_admin ? 'Ver nota' : 'Agregar nota') }}
             </button>
 
-            <div v-if="filaAbierta === r.id" class="mt-3">
+            <div v-if="expandido[r.id]" class="mt-3">
               <PanelNota
                 v-model="r.notas_admin"
                 :guardando="estadoGuardado[r.id] === 'guardando'"

@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PasoLayout from '../components/PasoLayout.vue'
 import { useReservaStore } from '../stores/reserva'
+import api from '../services/api'
 
 const router = useRouter()
 const store = useReservaStore()
@@ -17,6 +18,8 @@ const hoy = new Date()
 const mesActual = ref(hoy.getMonth())
 const anioActual = ref(hoy.getFullYear())
 const diaSeleccionado = ref(null)
+const diasAbiertos = ref([])
+const fechasBloqueadas = ref([])
 
 const nombreMes = computed(() => `${MESES[mesActual.value]} ${anioActual.value}`)
 
@@ -50,10 +53,33 @@ function mesSiguiente() {
   }
 }
 
-function esPasado(fecha) {
+function esDeshabilitado(fecha) {
   const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
-  return fecha < inicioHoy
+  if (fecha < inicioHoy) return true
+
+  const diaSemana = fecha.getDay() // 0=domingo...6=sábado, igual que el backend
+  if (!diasAbiertos.value.includes(diaSemana)) return true
+
+  const y = fecha.getFullYear()
+  const m = String(fecha.getMonth() + 1).padStart(2, '0')
+  const d = String(fecha.getDate()).padStart(2, '0')
+  const iso = `${y}-${m}-${d}`
+  if (fechasBloqueadas.value.includes(iso)) return true
+
+  return false
 }
+
+async function cargarDisponibilidad() {
+  try {
+    const respuesta = await api.get(`/negocios/${store.negocioId}/dias-disponibles`)
+    diasAbiertos.value = respuesta.data.dias_abiertos
+    fechasBloqueadas.value = respuesta.data.fechas_bloqueadas
+  } catch (e) {
+    // Si falla, no bloqueamos nada — mejor dejar elegir de más que trabar el flujo
+  }
+}
+
+onMounted(cargarDisponibilidad)
 
 function esSeleccionado(fecha) {
   return diaSeleccionado.value &&
@@ -102,10 +128,10 @@ function continuar() {
           <button
             v-if="fecha"
             @click="elegirDia(fecha)"
-            :disabled="esPasado(fecha)"
+            :disabled="esDeshabilitado(fecha)"
             class="aspect-square text-sm rounded-full flex items-center justify-center"
             :class="[
-              esPasado(fecha) ? 'text-borde cursor-not-allowed' : 'text-carbon hover:bg-acento',
+              esDeshabilitado(fecha) ? 'text-borde cursor-not-allowed' : 'text-carbon hover:bg-acento',
               esSeleccionado(fecha) ? 'bg-carbon text-white hover:bg-carbon' : '',
             ]"
           >

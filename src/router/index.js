@@ -11,6 +11,7 @@ import DashboardView from '../views/admin/DashboardView.vue'
 import ServiciosView from '../views/admin/ServiciosView.vue'
 import HorariosView from '../views/admin/HorariosView.vue'
 import NegocioView from '../views/admin/NegocioView.vue'
+import PersonalView from '../views/admin/PersonalView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
@@ -48,6 +49,12 @@ const router = createRouter({
       component: NegocioView,
       meta: { requiereAuth: true },
     },
+      {
+    path: '/admin/personal',
+    name: 'admin-personal',
+    component: PersonalView,
+    meta: { requiereAuth: true },
+  },
   ],
 })
 

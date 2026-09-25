@@ -15,8 +15,12 @@ const error = ref(null)
 
 onMounted(async () => {
   try {
-    const respuesta = await api.get(`/negocios/${store.negocioId}/servicios`)
-    servicios.value = respuesta.data
+    const [respServicios, respConfig] = await Promise.all([
+      api.get(`/negocios/${store.negocioId}/servicios`),
+      api.get(`/negocios/${store.negocioId}/configuracion`),
+    ])
+    servicios.value = respServicios.data
+    store.requiereElegirProfesional = respConfig.data.requiere_elegir_profesional
   } catch (e) {
     error.value = 'No se pudieron cargar los servicios.'
   } finally {
@@ -26,12 +30,12 @@ onMounted(async () => {
 
 function elegir(servicio) {
   store.seleccionarServicio(servicio)
-  router.push({ name: 'dia' })
+  router.push({ name: store.requiereElegirProfesional ? 'profesional' : 'dia' })
 }
 </script>
 
 <template>
-  <PasoLayout :paso="1" :total="4">
+  <PasoLayout :paso="1" :total="store.requiereElegirProfesional ? 5 : 4">
     <h1 class="text-xl font-semibold text-carbon mb-4">¿Qué servicio quieres?</h1>
 
     <p v-if="cargando" class="text-sm text-gris">Cargando servicios...</p>

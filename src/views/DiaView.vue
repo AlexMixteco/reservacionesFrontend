@@ -109,7 +109,7 @@ function continuar() {
 </script>
 
 <template>
-  <PasoLayout :paso="2" :total="4">
+  <PasoLayout :paso="store.requiereElegirProfesional ? 3 : 2" :total="store.requiereElegirProfesional ? 5 : 4">
     <h1 class="text-xl font-semibold text-carbon mb-4">Elige un día</h1>
 
     <div class="bg-white rounded-2xl border border-borde p-4">

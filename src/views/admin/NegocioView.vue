@@ -10,6 +10,7 @@ const negocio = reactive({
   direccion: '',
   telefono_whatsapp: '',
   color_marca: '#1E1E1C',
+  requiere_elegir_profesional: false,
 })
 
 const cargando = ref(true)
@@ -24,6 +25,7 @@ onMounted(async () => {
     negocio.direccion = respuesta.data.direccion ?? ''
     negocio.telefono_whatsapp = respuesta.data.telefono_whatsapp ?? ''
     negocio.color_marca = respuesta.data.color_marca ?? '#1E1E1C'
+    negocio.requiere_elegir_profesional = respuesta.data.requiere_elegir_profesional ?? false
   } catch (e) {
     error.value = 'No se pudo cargar la información del negocio.'
   } finally {
@@ -94,6 +96,23 @@ async function guardar() {
             <span class="text-sm text-gris">{{ negocio.color_marca }}</span>
           </div>
         </div>
+
+        <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm text-carbon">¿Los clientes eligen profesional?</label>
+          <p class="text-xs text-gris">Actívalo si tienes varios profesionales entre los que el cliente puede elegir.</p>
+        </div>
+        <button
+          @click="negocio.requiere_elegir_profesional = !negocio.requiere_elegir_profesional"
+          class="w-10 h-6 rounded-full relative shrink-0"
+          :class="negocio.requiere_elegir_profesional ? 'bg-carbon' : 'bg-borde'"
+        >
+          <span
+            class="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
+            :class="negocio.requiere_elegir_profesional ? 'left-4.5' : 'left-0.5'"
+          ></span>
+        </button>
+      </div>
 
         <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
 

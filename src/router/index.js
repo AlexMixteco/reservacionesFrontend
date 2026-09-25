@@ -12,12 +12,14 @@ import ServiciosView from '../views/admin/ServiciosView.vue'
 import HorariosView from '../views/admin/HorariosView.vue'
 import NegocioView from '../views/admin/NegocioView.vue'
 import PersonalView from '../views/admin/PersonalView.vue'
+import ProfesionalView from '../views/ProfesionalView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', name: 'servicio', component: ServicioView },
+    { path: '/profesional', name: 'profesional', component: ProfesionalView },
     { path: '/dia', name: 'dia', component: DiaView },
     { path: '/hora', name: 'hora', component: HoraView },
     { path: '/datos', name: 'datos', component: DatosView },

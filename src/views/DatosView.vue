@@ -54,6 +54,7 @@ async function confirmarReserva() {
       telefono_cliente: telefono.value,
       email_cliente: email.value || null,
       comentario_cliente: comentario.value || null,
+      personal_id: store.personal?.id || null,
     })
 
     router.push({ name: 'confirmacion', params: { token: respuesta.data.token_gestion } })
@@ -70,7 +71,7 @@ async function confirmarReserva() {
 </script>
 
 <template>
-  <PasoLayout :paso="4" :total="4">
+  <PasoLayout :paso="store.requiereElegirProfesional ? 5 : 4" :total="store.requiereElegirProfesional ? 5 : 4">
     <h1 class="text-xl font-semibold text-carbon mb-1">Tus datos</h1>
     <p class="text-sm text-gris mb-4">Solo para confirmar tu reserva</p>
 

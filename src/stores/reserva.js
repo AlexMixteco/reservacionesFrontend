@@ -10,6 +10,7 @@ export const useReservaStore = defineStore('reserva', () => {
   const fecha = ref(null)         // 'AAAA-MM-DD'
   const hora = ref(null)          // 'HH:mm'
   const personal = ref(null)      // opcional, objeto { id, nombre } o null
+  const requiereElegirProfesional = ref(false)
 
   const cliente = ref({
     nombre: '',
@@ -33,6 +34,10 @@ export const useReservaStore = defineStore('reserva', () => {
     cliente.value = { ...cliente.value, ...datos }
   }
 
+    function seleccionarPersonal(nuevoPersonal) {
+    personal.value = nuevoPersonal
+  }
+
   function reiniciar() {
     servicio.value = null
     fecha.value = null
@@ -53,5 +58,7 @@ export const useReservaStore = defineStore('reserva', () => {
     seleccionarHora,
     guardarDatosCliente,
     reiniciar,
+    seleccionarPersonal,
+    requiereElegirProfesional,
   }
 })

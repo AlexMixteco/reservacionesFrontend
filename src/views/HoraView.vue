@@ -26,6 +26,7 @@ onMounted(async () => {
       params: {
         servicio_id: store.servicio.id,
         fecha: store.fecha,
+        personal_id: store.personal?.id || undefined,
       },
     })
     horarios.value = respuesta.data.horarios_disponibles
@@ -48,7 +49,7 @@ function continuar() {
 </script>
 
 <template>
-  <PasoLayout :paso="3" :total="4">
+  <PasoLayout :paso="store.requiereElegirProfesional ? 4 : 3" :total="store.requiereElegirProfesional ? 5 : 4">
     <h1 class="text-xl font-semibold text-carbon mb-1">Elige una hora</h1>
     <p class="text-sm text-gris mb-4">Horarios disponibles</p>
 

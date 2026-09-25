@@ -76,12 +76,13 @@ async function cerrarSesion() {
           <button @click="router.push({ name: 'admin-horarios' })" class="text-sm text-gris hover:text-carbon">
             Horarios
           </button>
-          <button @click="router.push({ name: 'admin-negocio' })" class="text-sm text-gris hover:text-carbon">
-            Mi negocio
-          </button>
           <button @click="router.push({ name: 'admin-personal' })" class="text-sm text-gris hover:text-carbon">
             Profesionales
           </button>
+          <button @click="router.push({ name: 'admin-negocio' })" class="text-sm text-gris hover:text-carbon">
+            Mi negocio
+          </button>
+          
           <button @click="cerrarSesion" class="text-sm text-gris hover:text-carbon">Cerrar sesión</button>
         </div>
       </div>

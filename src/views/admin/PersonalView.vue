@@ -43,9 +43,14 @@ async function crearPersona() {
   if (!nuevoNombre.value.trim()) return
   creando.value = true
   try {
-    await api.post('/admin/personal', { nombre: nuevoNombre.value })
+    const respuesta = await api.post('/admin/personal', { nombre: nuevoNombre.value })
     nuevoNombre.value = ''
     await cargar()
+    // Abre el panel automático en cuanto se crea, sin que tengas que darle clic a "Editar"
+    const nuevaPersona = personal.value.find((p) => p.id === respuesta.data.id)
+    if (nuevaPersona) {
+      await alternarPanel(nuevaPersona)
+    }
   } finally {
     creando.value = false
   }

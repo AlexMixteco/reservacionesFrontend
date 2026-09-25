@@ -46,7 +46,7 @@ function mesSiguiente() {
   if (mesActual.value === 11) { mesActual.value = 0; anioActual.value += 1 }
   else mesActual.value += 1
 }
-function esPasado(fecha) {
+function esDeshabilitado(fecha) {
   const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())
   return fecha < inicioHoy
 }
@@ -62,7 +62,7 @@ function fechaISO(fecha) {
 }
 
 async function elegirDia(fecha) {
-  if (esPasado(fecha)) return
+  if (esDeshabilitado(fecha)) return
   diaSeleccionado.value = fecha
   horaSeleccionada.value = null
   cargandoHorarios.value = true
@@ -131,10 +131,10 @@ async function guardar() {
               <button
                 v-if="fecha"
                 @click="elegirDia(fecha)"
-                :disabled="esPasado(fecha)"
+                :disabled="esDeshabilitado(fecha)"
                 class="aspect-square text-sm rounded-full flex items-center justify-center"
                 :class="[
-                  esPasado(fecha) ? 'text-borde cursor-not-allowed' : 'text-carbon hover:bg-acento',
+                  esDeshabilitado(fecha) ? 'text-borde cursor-not-allowed' : 'text-carbon hover:bg-acento',
                   esSeleccionado(fecha) ? 'bg-carbon text-white hover:bg-carbon' : '',
                 ]"
               >

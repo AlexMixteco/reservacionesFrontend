@@ -87,7 +87,7 @@ function esSeleccionado(fecha) {
 }
 
 function elegirDia(fecha) {
-  if (esPasado(fecha)) return
+  if (esDeshabilitado(fecha)) return
   diaSeleccionado.value = fecha
 }
 

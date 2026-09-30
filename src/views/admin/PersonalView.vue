@@ -9,9 +9,6 @@ const personal = ref([])
 const servicios = ref([])
 const cargando = ref(true)
 
-const nuevoNombre = ref('')
-const creando = ref(false)
-
 const expandido = reactive({})
 const horariosPorPersona = reactive({})
 const guardandoServicios = reactive({})
@@ -26,6 +23,62 @@ const DIAS = [
   { numero: 6, nombre: 'Sábado' },
 ]
 
+function diasVacios() {
+  return reactive(
+    Object.fromEntries(DIAS.map((d) => [d.numero, { abierto: false, hora_inicio: '10:00', hora_fin: '20:00', guardando: false }]))
+  )
+}
+
+const nuevoNombre = ref('')
+const nuevosServicioIds = reactive(new Set())
+const nuevosDias = reactive(diasVacios())
+const creando = ref(false)
+
+function alternarNuevoServicio(servicioId) {
+  if (nuevosServicioIds.has(servicioId)) {
+    nuevosServicioIds.delete(servicioId)
+  } else {
+    nuevosServicioIds.add(servicioId)
+  }
+}
+
+function alternarNuevoDia(numeroDia) {
+  nuevosDias[numeroDia].abierto = !nuevosDias[numeroDia].abierto
+}
+
+async function crearPersona() {
+  if (!nuevoNombre.value.trim()) return
+  creando.value = true
+  try {
+    const respuesta = await api.post('/admin/personal', { nombre: nuevoNombre.value })
+    const nuevoId = respuesta.data.id
+
+    if (nuevosServicioIds.size > 0) {
+      await api.put(`/admin/personal/${nuevoId}/servicios`, {
+        servicio_ids: Array.from(nuevosServicioIds),
+      })
+    }
+
+    for (const d of DIAS) {
+      if (nuevosDias[d.numero].abierto) {
+        await api.put(`/admin/personal/${nuevoId}/horarios/${d.numero}`, {
+          abierto: true,
+          hora_inicio: nuevosDias[d.numero].hora_inicio,
+          hora_fin: nuevosDias[d.numero].hora_fin,
+        })
+      }
+    }
+
+    nuevoNombre.value = ''
+    nuevosServicioIds.clear()
+    Object.assign(nuevosDias, diasVacios())
+
+    await cargar()
+  } finally {
+    creando.value = false
+  }
+}
+
 async function cargar() {
   cargando.value = true
   const [respPersonal, respServicios] = await Promise.all([
@@ -38,23 +91,6 @@ async function cargar() {
 }
 
 onMounted(cargar)
-
-async function crearPersona() {
-  if (!nuevoNombre.value.trim()) return
-  creando.value = true
-  try {
-    const respuesta = await api.post('/admin/personal', { nombre: nuevoNombre.value })
-    nuevoNombre.value = ''
-    await cargar()
-    // Abre el panel automático en cuanto se crea, sin que tengas que darle clic a "Editar"
-    const nuevaPersona = personal.value.find((p) => p.id === respuesta.data.id)
-    if (nuevaPersona) {
-      await alternarPanel(nuevaPersona)
-    }
-  } finally {
-    creando.value = false
-  }
-}
 
 async function alternarActivo(persona) {
   const nuevoValor = !persona.activo
@@ -95,9 +131,7 @@ async function alternarPanel(persona) {
 }
 
 async function cargarHorarioPersona(personaId) {
-  const dias = reactive(
-    Object.fromEntries(DIAS.map((d) => [d.numero, { abierto: false, hora_inicio: '10:00', hora_fin: '20:00', guardando: false }]))
-  )
+  const dias = diasVacios()
   const respuesta = await api.get(`/admin/personal/${personaId}/horarios`)
   respuesta.data.forEach((h) => {
     dias[h.dia_semana] = {
@@ -140,23 +174,78 @@ function alternarDia(personaId, numeroDia) {
       <h1 class="text-xl font-semibold text-carbon mb-1">Profesionales</h1>
       <p class="text-sm text-gris mb-6">Quién trabaja en tu negocio, qué servicios da cada quien, y su horario propio.</p>
 
-      <div class="bg-white rounded-2xl border border-borde p-4 mb-6">
-        <p class="text-sm font-medium text-carbon mb-3">Agregar profesional</p>
-        <div class="flex gap-2">
+      <div class="bg-white rounded-2xl border border-borde p-4 mb-6 flex flex-col gap-4">
+        <div>
+          <p class="text-sm font-medium text-carbon mb-2">Nombre</p>
           <input
             v-model="nuevoNombre"
             type="text"
-            placeholder="Nombre"
-            class="flex-1 rounded-lg border border-borde bg-white px-3 py-2 text-sm text-carbon placeholder:text-gris"
+            placeholder="Nombre del profesional"
+            class="w-full rounded-lg border border-borde bg-white px-3 py-2 text-sm text-carbon placeholder:text-gris"
           />
-          <button
-            @click="crearPersona"
-            :disabled="creando"
-            class="rounded-lg bg-carbon text-white px-4 py-2 text-sm font-medium disabled:opacity-40"
-          >
-            Agregar
-          </button>
         </div>
+
+        <div>
+          <p class="text-sm font-medium text-carbon mb-2">Servicios que ofrece</p>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="s in servicios"
+              :key="s.id"
+              @click="alternarNuevoServicio(s.id)"
+              type="button"
+              class="text-xs rounded-full px-3 py-1.5 border"
+              :class="nuevosServicioIds.has(s.id)
+                ? 'bg-acento border-acento-borde text-carbon'
+                : 'bg-white border-borde text-gris'"
+            >
+              {{ s.nombre }}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-sm font-medium text-carbon mb-2">Horario propio (opcional — si no defines nada, usa el del negocio)</p>
+          <div class="flex flex-col gap-2">
+            <div v-for="d in DIAS" :key="d.numero" class="flex flex-col sm:flex-row sm:items-center gap-2 py-1">
+              <div class="flex items-center gap-3">
+                <button
+                  @click="alternarNuevoDia(d.numero)"
+                  type="button"
+                  class="w-10 h-6 rounded-full relative shrink-0"
+                  :class="nuevosDias[d.numero].abierto ? 'bg-carbon' : 'bg-borde'"
+                >
+                  <span
+                    class="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all"
+                    :class="nuevosDias[d.numero].abierto ? 'left-4.5' : 'left-0.5'"
+                  ></span>
+                </button>
+                <span class="text-sm text-carbon w-24 shrink-0">{{ d.nombre }}</span>
+              </div>
+              <div v-if="nuevosDias[d.numero].abierto" class="flex items-center gap-2">
+                <input
+                  v-model="nuevosDias[d.numero].hora_inicio"
+                  type="time"
+                  class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
+                />
+                <span class="text-sm text-gris">a</span>
+                <input
+                  v-model="nuevosDias[d.numero].hora_fin"
+                  type="time"
+                  class="rounded-lg border border-borde bg-white px-2 py-1 text-sm text-carbon"
+                />
+              </div>
+              <span v-else class="text-sm text-gris">Usa el horario general</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          @click="crearPersona"
+          :disabled="creando || !nuevoNombre.trim()"
+          class="rounded-lg bg-carbon text-white px-4 py-2 text-sm font-medium disabled:opacity-40 self-start"
+        >
+          {{ creando ? 'Creando...' : 'Agregar profesional' }}
+        </button>
       </div>
 
       <p v-if="cargando" class="text-sm text-gris">Cargando...</p>
